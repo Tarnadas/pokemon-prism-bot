@@ -10,7 +10,6 @@ import { botToken } from './secret'
 
 const client = new Discord.Client()
 
-// this is a damn long url I got from gbahacks.blogspot.com which contains the latest bsp patch file
 // TODO is there any better repo for updated bsp files?
 const bspUrl = 'https://goo.gl/9qatSQ';
 
