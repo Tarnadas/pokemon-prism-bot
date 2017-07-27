@@ -23,8 +23,8 @@ $ npm start
 
 7zip company
 
+ax6
+
 Tarnadas
 
 Retrosol
-
-other users I don't yet know, but will add them later

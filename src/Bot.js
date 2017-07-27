@@ -59,6 +59,10 @@ export default class Bot {
       try {
         this.option[clientId] = parseInt(message.content) - 1
         if (isNaN(this.option[clientId])) throw ''
+        if (this.option[clientId] < 0 || this.option[clientId] > 1) {
+          message.author.send('Your number is out of bounds.')
+          return
+        }
         this.waitForOption[clientId] = false
       } catch (err) {
         message.author.send('Error: Dude, this is not a number.')
@@ -82,6 +86,10 @@ export default class Bot {
 
     if (!this.file[clientId]) {
       message.author.send(`Hey ${message.author.username}\nI am a Bot, who can update your Crystal ROM to the latest Pokémon Prism release.\nJust send me your dumped ROM and I will do the rest for you.`)
+      return
+    }
+    if (!this.bsp || !(this.bsp instanceof ArrayBuffer)) {
+      message.author.send('I couldn\'t find a valid patch file. Please try again later.')
       return
     }
 
@@ -119,7 +127,7 @@ export default class Bot {
     } catch (err) {
       // file was not able to be patched
       console.error(err)
-      message.author.send(`An internal error occurred: ${err}\nPlease report this error to the author of the Bot`)
+      message.author.send(`An internal error occurred: ${err}\nPlease report this error to the author of the Bot.`)
     }
   }
 
