@@ -1,19 +1,47 @@
-export default function begin_patch (bsp, input) {
-  return new Promise((resolve, reject) => {
+export const BSP_RESULT = {
+  ERROR: -1,
+  MENU: 0,
+  SUCCESS: 1
+}
+
+export default function begin_patch (bsp, input, option) {
+  return new Promise(resolve => {
     const patcher = new BSPPatcher(bsp, input)
+    const messages = []
+    patcher.print = message => {
+      messages.push(message)
+      patcher.run()
+    }
+    patcher.menu = options => {
+      if (option != null) {
+        patcher.run(option)
+      } else {
+        resolve([
+          BSP_RESULT.MENU,
+          options,
+          messages
+        ])
+      }
+    }
     patcher.error = err => {
-      console.error(err)
-      reject(err)
+      resolve([
+        resolve.ERROR,
+        `Error: ${err.toString()}`
+      ])
     }
     patcher.failure = status => {
-      console.log("Patch finished with status " + status.toString())
-      reject(status)
+      resolve([
+        BSP_RESULT.ERROR,
+        `Patch exited with status ${status.toString()}`
+      ])
     }
     patcher.success = data => {
-      console.log('success')
-      resolve(data)
+      resolve([
+        BSP_RESULT.SUCCESS,
+        data
+      ])
     }
-    patcher.run(0)
+    patcher.run(option)
   })
 }
 
@@ -1185,12 +1213,10 @@ function BSPPatcher (bsp, input) {
       case 4: callback = self.success; break;
       default: return;
     }
-    console.log('finish')
-    console.log(get_state())
     frames = undefined;
     file_buffer = undefined;
     bsp = undefined;
-    if (callback == null) return;
+    if (callback === undefined) return;
     var result = get_result();
     queue_function(function () {callback(result);});
   }
@@ -1228,7 +1254,6 @@ function BSPPatcher (bsp, input) {
   }
 
   function run (param) {
-    console.log('run')
     if (!initialized) return queue_function(function () {
       initialize();
       execute();
