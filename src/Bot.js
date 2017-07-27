@@ -34,6 +34,7 @@ export default class Bot {
     this.file = {}
     this.option = {}
     this.waitForOption = {}
+    this.isSave = {}
 
     this.client.on("ready", () => {
       console.log("I am ready!")
@@ -103,6 +104,7 @@ export default class Bot {
           resultMessage += messages[i] + '\n'
         }
         resultMessage += `(1) ${result[0]} | (2) ${result[1]}\n(please just send the respective number)`
+        if (resultMessage.includes('savefile')) this.isSave[clientId] = true
         message.author.send(resultMessage)
         this.waitForOption[clientId] = true
       } else if (code === BSP_RESULT.SUCCESS) {
@@ -110,17 +112,19 @@ export default class Bot {
         message.author.send('Here is your patched file', { files: [
           {
             attachment: Buffer.from(result),
-            name: `PokemonPrism.gbc`
+            name: `PokemonPrism.${this.isSave[clientId] ? 'sav' : 'gbc'}`
           }
         ]})
         delete this.file[clientId]
         delete this.option[clientId]
         delete this.waitForOption[clientId]
+        delete this.isSave[clientId]
       } else if (code === BSP_RESULT.ERROR) {
         message.author.send(`Error: ${result}`)
         delete this.file[clientId]
         delete this.option[clientId]
         delete this.waitForOption[clientId]
+        delete this.isSave[clientId]
       }
 
       // send back to user
