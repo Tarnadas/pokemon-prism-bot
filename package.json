@@ -1,0 +1,37 @@
+{
+  "name": "pokemon-prism-bot",
+  "version": "1.0.0",
+  "description": "A Discord Bot for Pokemon Prism",
+  "main": "index.js",
+  "scripts": {
+    "compile": "babel src --out-dir lib",
+    "start": "npm run compile && node ./lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tarnadas/pokemon-prism-bot.git"
+  },
+  "keywords": [
+    "pokemon",
+    "prism",
+    "discord",
+    "bot",
+    "patch",
+    "patcher"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Tarnadas/pokemon-prism-bot/issues"
+  },
+  "homepage": "https://github.com/Tarnadas/pokemon-prism-bot#readme",
+  "dependencies": {
+    "discord.js": "^11.1.0",
+    "got": "^7.1.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-preset-env": "^1.6.0"
+  }
+}
