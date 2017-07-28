@@ -4,46 +4,57 @@ export const BSP_RESULT = {
   SUCCESS: 1
 }
 
-export default function begin_patch (bsp, input, option) {
-  return new Promise(resolve => {
-    const patcher = new BSPPatcher(bsp, input)
-    const messages = []
-    patcher.print = message => {
-      messages.push(message)
-      patcher.run()
-    }
-    patcher.menu = options => {
-      if (option != null) {
-        patcher.run(option)
-      } else {
-        resolve({
-          code: BSP_RESULT.MENU,
-          options,
-          messages
-        })
-      }
-    }
-    patcher.error = err => {
-      resolve({
-        code: BSP_RESULT.ERROR,
-        messages: [`Error: ${err.toString()}`]
-     })
-    }
-    patcher.failure = status => {
-      resolve({
-        code: BSP_RESULT.ERROR,
-        messages: [`Patch exited with status ${status.toString()}`]
-      })
-    }
-    patcher.success = data => {
-      resolve({
-        code: BSP_RESULT.SUCCESS,
-        data,
-        messages
-      })
-    }
-    patcher.run(option)
-  })
+export default class Patcher {
+  constructor (bsp, input) {
+    this.patcher = new BSPPatcher(bsp, input)
+  }
+
+  async patch (option) {
+    return await new Promise(resolve => {
+      this.messages = []
+      this.patcher.print = this.onPrint.bind(this)
+      this.patcher.menu = this.onMenu.bind(this, resolve)
+      this.patcher.error = this.onError.bind(this, resolve)
+      this.patcher.failure = this.onFailure.bind(this, resolve)
+      this.patcher.success = this.onSuccess.bind(this, resolve)
+      this.patcher.run(option)
+    })
+  }
+
+  onPrint (message) {
+    this.messages.push(message)
+    this.patcher.run()
+  }
+
+  onMenu (resolve, options) {
+    resolve({
+      code: BSP_RESULT.MENU,
+      options,
+      messages: this.messages
+    })
+  }
+
+  onError (resolve, err) {
+    resolve({
+      code: BSP_RESULT.ERROR,
+      messages: [`Error: ${err.toString()}`]
+    })
+  }
+
+  onFailure (resolve, status) {
+    resolve({
+    code: BSP_RESULT.ERROR,
+      messages: [`Patch exited with status ${status.toString()}`]
+    })
+  }
+
+  onSuccess (resolve, data) {
+    resolve({
+      code: BSP_RESULT.SUCCESS,
+      data,
+      messages: this.messages
+    })
+  }
 }
 
 function BSPPatcher (bsp, input) {

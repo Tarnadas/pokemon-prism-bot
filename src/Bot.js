@@ -18,12 +18,13 @@ import path from 'path'
 import { botToken } from './secret'
 
 // this is the bsppatch.js file, slightly changed to support Node and minified with Google Closure Compiler
-import bspPatch, { BSP_RESULT } from './bsppatch'
+import Patcher, { BSP_RESULT } from './bsppatch'
 
 const zipLib = new Zip()
 const unzip = zipLib.extractFull
 
 const UPDATE_BSP_DELAY = 60000
+const USER_TIMEOUT_DELAY = 600000
 
 export default class Bot {
   constructor (channelId) {
@@ -39,7 +40,8 @@ export default class Bot {
     this.waitForOption = {}
     this.optionSize = {}
     this.isSave = {}
-    this.messagesSent = {}
+    this.patcher = {}
+    this.onTimeout = {}
 
     this.client.on("ready", () => {
       console.log("I am ready!")
@@ -100,24 +102,34 @@ export default class Bot {
 
     // PATCH IT BABY
     try {
-      const { code, options, data, messages } = await bspPatch(this.bsp, this.file[clientId], this.option[clientId])
+      if (!this.patcher[clientId]) {
+        this.patcher[clientId] = new Patcher(this.bsp, this.file[clientId])
+        this.onTimeout[clientId] = () => {
+          setTimeout(() => {
+            message.author.send('Aborting because of inactivity.')
+            this.clearUser(clientId)
+          }, USER_TIMEOUT_DELAY)
+        }
+        this.onTimeout[clientId]()
+      }
+      const { code, options, data, messages } = await this.patcher[clientId].patch(this.option[clientId])
 
       let resultMessage = ''
-      for (let i = this.messagesSent[clientId] ? this.messagesSent[clientId] : 0; i < messages.length; i++) {
+      for (let i = 0; i < messages.length; i++) {
         resultMessage += `${messages[i]}\n`
       }
-      if (code === BSP_RESULT.MENU && messages) {
+      if (code === BSP_RESULT.MENU) {
+        // display menu to user
         for (let i = 0; i < options.length; i++) {
           resultMessage += `(${i + 1}) ${options[i]} `
         }
         resultMessage += '\n(please just send the respective number)'
         if (resultMessage.includes('savefile')) this.isSave[clientId] = true
         this.optionSize[clientId] = options.length
-        this.messagesSent[clientId] = messages.length
         this.waitForOption[clientId] = true
         message.author.send(resultMessage)
       } else if (code === BSP_RESULT.SUCCESS) {
-        this.messagesSent[clientId] = messages.length
+        // send result to user
         message.author.send(resultMessage)
         message.author.send('Uploading your patched file. Please be patient.')
         message.author.send('Here is your patched file', { files: [
@@ -128,11 +140,9 @@ export default class Bot {
         ]})
         this.clearUser(clientId)
       } else if (code === BSP_RESULT.ERROR) {
-        message.author.send(`Error: ${result}`)
+        message.author.send(`Error: ${messages[0]}`)
         this.clearUser(clientId)
       }
-
-      // send back to user
     } catch (err) {
       // file was not able to be patched
       console.error(err)
@@ -220,7 +230,8 @@ export default class Bot {
     delete this.waitForOption[clientId]
     delete this.optionSize[clientId]
     delete this.isSave[clientId]
-    delete this.messagesSent[clientId]
+    delete this.patcher[clientId]
+    delete this.onTimeout[clientId]
   }
 }
 
