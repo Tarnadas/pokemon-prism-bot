@@ -140,7 +140,7 @@ export default class Bot {
         ]})
         this.clearUser(clientId)
       } else if (code === BSP_RESULT.ERROR) {
-        message.author.send(`Error: ${messages[0]}`)
+        message.author.send(resultMessage)
         this.clearUser(clientId)
       }
     } catch (err) {
@@ -231,6 +231,7 @@ export default class Bot {
     delete this.optionSize[clientId]
     delete this.isSave[clientId]
     delete this.patcher[clientId]
+    clearTimeout(this.onTimeout[clientId])
     delete this.onTimeout[clientId]
   }
 }

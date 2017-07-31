@@ -35,16 +35,18 @@ export default class Patcher {
   }
 
   onError (resolve, err) {
+    this.messages.push(`Error: ${err.toString()}`)
     resolve({
       code: BSP_RESULT.ERROR,
-      messages: [`Error: ${err.toString()}`]
+      messages: this.messages
     })
   }
 
   onFailure (resolve, status) {
+    this.messages.push(`Patch exited with status ${status.toString()}`)
     resolve({
-    code: BSP_RESULT.ERROR,
-      messages: [`Patch exited with status ${status.toString()}`]
+      code: BSP_RESULT.ERROR,
+      messages: this.messages
     })
   }
 
