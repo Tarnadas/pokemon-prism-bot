@@ -93,7 +93,7 @@ export default class Bot {
     }
 
     if (!this.file[clientId]) {
-      message.author.send(`Hey ${message.author.username}\nI am a Bot created by Tarnadas, Retrosol and ax6 who can update your Crystal ROM to the latest Pokémon Prism release.  I can also update your Pokemon Prism Save File to the newest version.\nJust send me your Pokemon Crystal Rom,or Pokemon Prism Save File and I will do the rest for you.`)
+      message.author.send(`Hey ${message.author.username}\nI am a Bot created by Tarnadas, Retrosol and ax6 who can update your Crystal ROM to the latest Pokémon Prism release. I can also update your Pokemon Prism Save File to the newest version.\nJust send me your Pokemon Crystal Rom or Pokemon Prism Save File and I will do the rest for you.`)
       return
     }
     if (!this.bsp || !(this.bsp instanceof ArrayBuffer)) {
