@@ -44,7 +44,8 @@ export default class Bot {
     this.onTimeout = {}
 
     this.client.on("ready", () => {
-      console.log("I am ready!")
+      this.client.user.setGame('DM for patching a ROM/Save');
+      console.log("Let's Get Patching!")
       this.channel = this.client.channels.get(channelId)
       this.initializeBsp()
       this.updateBsp()
@@ -92,7 +93,7 @@ export default class Bot {
     }
 
     if (!this.file[clientId]) {
-      message.author.send(`Hey ${message.author.username}\nI am a Bot created by Tarnadas, Retrosol and ax6 who can update your Crystal ROM to the latest Pokémon Prism release.\nJust send me your dumped ROM and I will do the rest for you.`)
+      message.author.send(`Hey ${message.author.username}\nI am a Bot created by Tarnadas, Retrosol and ax6 who can update your Crystal ROM to the latest Pokémon Prism release.  I can also update your Pokemon Prism Save File to the newest version.\nJust send me your Pokemon Crystal Rom,or Pokemon Prism Save File and I will do the rest for you.`)
       return
     }
     if (!this.bsp || !(this.bsp instanceof ArrayBuffer)) {
@@ -106,7 +107,7 @@ export default class Bot {
         this.patcher[clientId] = new Patcher(this.bsp, this.file[clientId])
         this.onTimeout[clientId] = () => {
           setTimeout(() => {
-            message.author.send('Aborting because of inactivity.')
+            
             this.clearUser(clientId)
           }, USER_TIMEOUT_DELAY)
         }
