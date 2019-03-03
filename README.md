@@ -19,6 +19,19 @@ Add `7z.exe` to your Bot's root folder (the one containing `package.json`)
 $ npm start
 ```
 
+### Run using docker-compose
+
+```
+# -- Prism Patcher Bot
+prism:
+    image: 'prism:latest'
+    build: '/path/to/Dockerfile'
+    restart: 'on-failure:5' # Restarts the bot if it fails to load 5 times
+    expose:
+        - '80'
+        - '443'
+```
+
 ## Credits
 
 7zip company
