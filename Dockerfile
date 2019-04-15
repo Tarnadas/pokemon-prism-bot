@@ -1,6 +1,7 @@
 FROM node:latest
 MAINTAINER Nick Goldstein <nick@nickgoldstein.com>
 WORKDIR /opt/ppbot/
+COPY . /opt/ppbot/
 RUN npm install
 RUN apt-get update && apt-get install -y \
     p7zip \
